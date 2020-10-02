@@ -1,0 +1,14 @@
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\bin\Debug\WhatIsSteveDoing.exe
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\bin\Debug\WhatIsSteveDoing.pdb
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing.csprojAssemblyReference.cache
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\MainWindow.g.cs
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\App.g.cs
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing_MarkupCompile.cache
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing_MarkupCompile.lref
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\MainWindow.baml
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing.g.resources
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing.Properties.Resources.resources
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing.csproj.GenerateResource.cache
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing.csproj.CoreCompileInputs.cache
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing.exe
+C:\Users\Stapxs\OneDrive\项目\WPFCode\WhatIsSteveDoing\obj\Debug\WhatIsSteveDoing.pdb
