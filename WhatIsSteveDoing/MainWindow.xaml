@@ -39,17 +39,26 @@
                         <TextBlock Text="其他功能" Margin="0,10,0,0"/>
                         <Button x:Name="hidd" Content="隐藏窗口" Height="30" Click="hidd_Click" Margin="0,10,0,0"/>
                         <Button x:Name="setautohidd" Content="设置为启动自动隐藏窗口" Height="30" Click="setautohidd_Click" Margin="0,10,0,0"/>
-                        <Button x:Name="pathbtm" Content="暂停同步" Height="30" Click="path_Click" Margin="0,10,0,0"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
             <TabItem Header=" 屏  蔽 ">
-                <StackPanel>
-                    <TextBlock Text="添加关键词屏蔽、应用屏蔽，以"
+                <StackPanel Margin="50,10,50,10">
+                    <TextBlock Text="添加关键词屏蔽，以防止隐私泄露。显示在下面列表内的关键词将不会被同步。（支持正则表达式）"></TextBlock>
+                    <Grid Height="403">
+                        <ListBox Margin="0,10,238,10" x:Name="hidlist"></ListBox>
+                        <StackPanel Margin="470,0,0,0">
+                            <TextBox x:Name="hidadd" Margin="0,10,0,0" Height="30"></TextBox>
+                            <Button x:Name="savehid" Content="添加" Margin="0,10,0,0" Height="30" Click="savehid_Click"></Button>
+                            <Button x:Name="delhid" Content="删除" Margin="0,10,0,0" Height="30" Click="delhid_Click"></Button>
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
             </TabItem>
             <TabItem Header=" 日  志 ">
-                <TextBox x:Name="logbox" Text=">>> Logs-懒得认真做界面-反正最后要隐藏"/>
+                <ScrollViewer Margin="50,10,50,10">
+                    <TextBox x:Name="logbox" Text=">>> Logs-懒得认真做界面-反正最后要隐藏"/>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </Grid>

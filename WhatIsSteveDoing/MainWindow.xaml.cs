@@ -9,6 +9,7 @@ using System.Threading;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Diagnostics;
+using System.Windows.Controls;
 
 namespace WhatIsSteveDoing
 {
@@ -19,12 +20,16 @@ namespace WhatIsSteveDoing
     {
 
         string yname = "";
+        long yqq = 0;
+        string ygroup = "";
+        System.Collections.Generic.List<string> hidList = new System.Collections.Generic.List<string>();
         string fsave = "WISD.ini";
         System.Collections.Generic.List<setVer> sets = new System.Collections.Generic.List<setVer>();
         string lastname = "";
         Thread thread;
         bool exit = false;
         bool path = false;
+        bool noqq = true;
 
         // 跳过次数
         int passTimes = 0;
@@ -34,12 +39,30 @@ namespace WhatIsSteveDoing
             InitializeComponent();
             this.Closing += Window_Closing;
             sets = ReadSet();
+            foreach(setVer set in sets)
+            {
+                logbox.Text += "\t" + set.name + " --> " + set.value + "\n";
+            }
 
+            // 初始化设置
             setVer nameset = GetSet("name");
             if (nameset.name != "Err")
             {
                 yname = nameset.value;
                 name.Text = yname;
+            }
+            setVer qqset = GetSet("qq");
+            if (qqset.name != "Err")
+            {
+                noqq = false;
+                yqq = long.Parse(qqset.value);
+                qq.Text = yqq.ToString();
+            }
+            setVer groupset = GetSet("group");
+            if (groupset.name != "Err")
+            {
+                ygroup = groupset.value;
+                group.Text = ygroup;
             }
             setVer ahid = GetSet("autohid");
             if (ahid.value == "true")
@@ -47,6 +70,18 @@ namespace WhatIsSteveDoing
                 setautohidd.Visibility = Visibility.Collapsed;
                 this.ShowInTaskbar = false;
                 this.Hide();
+            }
+            setVer hid = GetSet("hidlist");
+            if (hid.name != "Err")
+            {
+                string[] list = hid.value.Split(',');
+                for (int i = 0; i < list.Length; i++)
+                {
+                    hidList.Add(list[i]);
+                    ListBoxItem item = new ListBoxItem();
+                    item.Content = list[i];
+                    hidlist.Items.Add(item);
+                }
             }
 
             logbox.Text += GetForgroundAppInfo();
@@ -153,9 +188,9 @@ namespace WhatIsSteveDoing
 
         public System.Collections.Generic.List<setVer> ReadSet()
         {
-            logbox.Text += "\n>> 读取设置……";
+            logbox.Text += "\n>> 读取设置……\n";
             System.Collections.Generic.List<setVer> info = new System.Collections.Generic.List<setVer>();
-            StreamReader sr = new StreamReader(fsave, Encoding.Default);
+            StreamReader sr = new StreamReader(fsave, Encoding.GetEncoding("UTF-8"));
             String line;
             while ((line = sr.ReadLine()) != null)
             {
@@ -163,7 +198,6 @@ namespace WhatIsSteveDoing
                 {
                     string[] infolist = line.Split(':');
                     info.Add(new setVer(infolist[0], infolist[1]));
-                    logbox.Text += "\n" + infolist[0] + ":" + infolist[1];
                 }
             }
             sr.Close();
@@ -180,6 +214,19 @@ namespace WhatIsSteveDoing
                 }
             }
             return new setVer("Err", "NoFound");
+        }
+
+        public string SetSet (setVer set)
+        {
+            for(int i = 0; i < sets.Count; i++)
+            {
+                if(sets[i].name == set.name)
+                {
+                    sets[i] = set;
+                    return "OK";
+                }
+            }
+            return "NOFOUND";
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
@@ -219,26 +266,51 @@ namespace WhatIsSteveDoing
             // 测试
             says += "\n>> 当前的前台窗口标题为：" + s.ToString() + "\n句柄：" + (int)hWnd;
 
+            // 屏蔽
+            string title = s.ToString();
+            if (isInList(hidList, s.ToString()))
+            {
+                title = "******";
+                says += "\n! 触发屏蔽词，已替换 !";
+            }
+
             // 发送数据
             if (!string.IsNullOrWhiteSpace(lastname))
             {
                 if (lastname != s.ToString())
                 {
-                    setVer nameset = GetSet("name");
-                    if (nameset.name != "Err")
+                    if (!String.IsNullOrWhiteSpace(yname))
                     {
                         says += "\n>> 数据变更";
                         string time = GetTimeStamp();
                         lastname = s.ToString();
-                        string url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" + s.ToString() + "&name=" + nameset.value + "&time=" + time + "&type=PC";
+                        string url = "";
                         says += "\n>> 发送数据……";
+                        if (noqq)
+                        {
+                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                "&type=PC";
+                            says += "\ndo= " +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                "&type=PC";
+                        }
+                        else
+                        {
+                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                "&type=PC";
+                            says += "\ndo= " +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                "&type=PC";
+                        }
                         string back = CallWebPage(url, null, null);
                         says += "\n返回：" + back;
                         passTimes = 0;
                     }
                     else
                     {
-                        says += "\n错误：用户名设置不存在，请设置后重启。";
+                        says += "\n错误：用户名不存在。";
                     }
                 }
                 else
@@ -253,8 +325,26 @@ namespace WhatIsSteveDoing
                         says += "\n>> 防过期刷新";
                         string time = GetTimeStamp();
                         lastname = s.ToString();
-                        string url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" + s.ToString() + "&name=" + yname + "&time=" + time + "&type=PC";
+                        string url = "";
                         says += "\n>> 发送数据……";
+                        if (noqq)
+                        {
+                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                "&type=PC";
+                            says += "\ndo= " +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                "&type=PC";
+                        }
+                        else
+                        {
+                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                "&type=PC";
+                            says += "\ndo= " +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                "&type=PC";
+                        }
                         string back = CallWebPage(url, null, null);
                         says += "\n返回：" + back;
                         passTimes = 0;
@@ -264,13 +354,30 @@ namespace WhatIsSteveDoing
             else
             {
                 says += "\n>> 上次数据空白或不存在";
-                setVer nameset = GetSet("name");
-                if (nameset.name != "Err")
+                if (!String.IsNullOrWhiteSpace(yname))
                 {
                     string time = GetTimeStamp();
                     lastname = s.ToString();
-                    string url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" + s.ToString() + "&name=" + nameset.value + "&time=" + time + "&type=PC";
+                    string url = "";
                     says += "\n>> 发送数据……";
+                    if (noqq)
+                    {
+                        url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                            "&type=PC";
+                        says += "\ndo= " +
+                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                            "&type=PC";
+                    }
+                    else
+                    {
+                        url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                            "&type=PC";
+                        says += "\ndo=" +
+                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                            "&type=PC";
+                    }
                     string back = CallWebPage(url, null, null);
                     says += "\n返回：" + back;
                 }
@@ -367,52 +474,84 @@ namespace WhatIsSteveDoing
 
         private void save_Click(object sender, RoutedEventArgs e)
         {
-            yname = name.Text;
-            string saveline = "";
-            bool isGet = false;
-            if (File.Exists(fsave))
+            if(!String.IsNullOrWhiteSpace(name.Text) &&
+                !String.IsNullOrWhiteSpace(group.Text))
             {
-                StreamReader sr = new StreamReader(fsave, Encoding.Default);
-                String line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] info = line.Split(':');
-                    if (info[0] == "name")
-                    {
-                        isGet = true;
-                        saveline += "name:" + yname + "\n";
-                    }
-                    else
-                    {
-                        saveline += line + "\n";
-                    }
+                logbox.Text += "\n>> 保存设置：";
 
-                }
-                sr.Close();
-                if (isGet)
+                string saveline = "";
+
+                if(name.Text.IndexOf("/") >= 0 ||
+                    name.Text.IndexOf(":") >= 0)
                 {
-                    logbox.Text += "\n>> 正在保存设置……";
-                    logbox.Text += saveline;
-                    File.WriteAllText(fsave, saveline);
+                    MessageBox.Show("用户名不能包含“/”、“：”！");
+                    return;
+                }
+
+                else
+                {
+                    yname = name.Text;
+                }
+                if (!String.IsNullOrWhiteSpace(qq.Text))
+                {
+                    try
+                    {
+                        yqq = long.Parse(qq.Text);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("QQ 号不合法！");
+                        return;
+                    }
+                }
+                ygroup = group.Text;
+
+                if (!String.IsNullOrWhiteSpace(qq.Text))
+                {
+                    noqq = false;
+                }
+
+                    if (File.Exists(fsave))
+                {
+                    logbox.Text += "修改";
+                    if (!String.IsNullOrWhiteSpace(qq.Text))
+                    {
+                        if (SetSet(new setVer("qq", yqq.ToString())) == "NOFOUND")
+                        {
+                            sets.Add(new setVer("qq", yqq.ToString()));
+                        }
+                    }
+                    if (SetSet(new setVer("name", yname)) == "NOFOUND")
+                    {
+                        sets.Add(new setVer("name", yname));
+                    }
+                    if (SetSet(new setVer("group", ygroup)) == "NOFOUND")
+                    {
+                        sets.Add(new setVer("group", ygroup));
+                    }
                 }
                 else
                 {
-                    FileStream fs = new FileStream(fsave, FileMode.Append);
-                    StreamWriter sw = new StreamWriter(fs);
-                    sw.WriteLine("name:" + yname + "\n");
-                    sw.Flush();
-                    sw.Close();
-                    fs.Close();
+                    logbox.Text += "增加";
+                    if (!String.IsNullOrWhiteSpace(qq.Text))
+                    {
+                        sets.Add(new setVer("qq", yqq.ToString()));
+                    }
+                    sets.Add(new setVer("name", yname));
+                    sets.Add(new setVer("group", ygroup));
                 }
+
+                foreach (setVer set in sets)
+                {
+                    saveline += set.name + ":" + set.value + "\n";
+                }
+                logbox.Text += "\n>> 正在保存设置……\n";
+                logbox.Text += saveline;
+                File.WriteAllText(fsave, saveline);
             }
             else
             {
-                FileStream fs = new FileStream(fsave, FileMode.Open, FileAccess.Write);
-                StreamWriter sr = new StreamWriter(fs);
-                sr.WriteLine("name:" + yname + "\n");
-                sr.Flush();
-                sr.Close();
-                fs.Close();
+                MessageBox.Show("请输入内容！");
             }
         }
 
@@ -438,44 +577,7 @@ namespace WhatIsSteveDoing
         {
             exit = true;
             thread.Abort();
-            string time = GetTimeStamp();
-            string url = "https://stapx.chuhelan.com/api/SS-Doing/?do=此用户已退出%20WISD%20同步程序。" + "&name=" + yname + "&time=" + time + "&type=PC";
-            logbox.Text += "\n>> 发送数据……";
-            string back = CallWebPage(url, null, null);
-            logbox.Text += "\n返回：" + back;
             e.Cancel = false;
-        }
-
-        public void Command()
-        {
-            MessageBox.Show("abab");
-        }
-
-        private void path_Click(object sender, RoutedEventArgs e)
-        {
-            if (path)
-            {
-                path = false;
-                pathbtm.Content = "继续同步";
-                logbox.Text += "\n>>> 已暂停提交数据。";
-
-                string time = GetTimeStamp();
-                string url = "https://stapx.chuhelan.com/api/SS-Doing/?do=此用户已暂停%20WISD%20同步程序。" + "&name=" + yname + "&time=" + time + "&type=PC";
-                logbox.Text += "\n>> 发送数据……";
-                string back = CallWebPage(url, null, null);
-                logbox.Text += "\n返回：" + back;
-
-                lastname = "此用户已暂停 WISD 同步程序。";
-            }
-            else
-            {
-                path = true;
-                pathbtm.Content = "暂停同步";
-                logbox.Text += "\n>>> 已继续提交数据。";
-
-                string back = GetForgroundAppInfo();
-                logbox.Text += back;
-            }
         }
 
         public static string GetTimeStamp()
@@ -483,6 +585,89 @@ namespace WhatIsSteveDoing
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
             return Convert.ToInt64(ts.TotalSeconds).ToString();
 
+        }
+
+        private void savehid_Click(object sender, RoutedEventArgs e)
+        {
+            if(!String.IsNullOrWhiteSpace(hidadd.Text))
+            {
+                hidList.Add(hidadd.Text);
+                ListBoxItem item = new ListBoxItem();
+                item.Content = hidadd.Text;
+                hidlist.Items.Add(item);
+                setVer hid = GetSet("hidlist");
+                if (hid.name == "Err")
+                {
+                    sets.Add(new setVer("hidlist", hidadd.Text));
+                }
+                else
+                {
+                    SetSet(new setVer("hidlist", hid.value + "," + hidadd.Text));
+                }
+                string saveline = "";
+                foreach (setVer set in sets)
+                {
+                    saveline += set.name + ":" + set.value + "\n";
+                }
+                logbox.Text += "\n>> 正在保存设置……\n";
+                logbox.Text += saveline;
+                File.WriteAllText(fsave, saveline);
+            }
+            else
+            {
+                MessageBox.Show("请输入内容！");
+            }
+        }
+
+        public bool isInList(System.Collections.Generic.List<string> list, string name)
+        {
+            foreach(string st in list)
+            {
+                if (name.IndexOf(st) >= 0)
+                    return true;
+                bool result = System.Text.RegularExpressions.Regex.IsMatch(name, st);
+                if (result)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void delhid_Click(object sender, RoutedEventArgs e)
+        {
+            if(hidlist.SelectedIndex != -1)
+            {
+                string save = "";
+                bool isGet = false;
+                ListBoxItem item = (ListBoxItem)hidlist.SelectedItem;
+                foreach (string str in hidList)
+                {
+                    if (str == item.Content.ToString())
+                    {
+                        hidlist.Items.Remove(item);
+                        isGet = true;
+                    }
+                    else
+                    {
+                        save += str + ",";
+                    }
+                }
+                if (isGet)
+                {
+                    hidList.Remove(item.Content.ToString());
+                    SetSet(new setVer("hidlist", save.Substring(0, save.Length - 1)));
+                    string saveline = "";
+                    foreach (setVer set in sets)
+                    {
+                        saveline += set.name + ":" + set.value + "\n";
+                    }
+                    logbox.Text += "\n>> 正在保存设置……\n";
+                    logbox.Text += saveline;
+                    File.WriteAllText(fsave, saveline);
+                }
+            }
+            hidadd.Text = "";
         }
     }
 }
