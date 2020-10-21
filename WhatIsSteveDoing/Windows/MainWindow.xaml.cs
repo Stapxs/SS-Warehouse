@@ -44,6 +44,9 @@ namespace WhatIsSteveDoing
                 logbox.Text += "\t" + set.name + " --> " + set.value + "\n";
             }
 
+            // 初始化控件
+            MainTab.SelectedIndex = 1;
+
             // 初始化设置
             setVer nameset = GetSet("name");
             if (nameset.name != "Err")
@@ -431,7 +434,7 @@ namespace WhatIsSteveDoing
 
                 //读取返回结果
                 resp = req.GetResponse();
-                sr = new System.IO.StreamReader(resp.GetResponseStream(), System.Text.Encoding.Default);
+                sr = new System.IO.StreamReader(resp.GetResponseStream(), System.Text.Encoding.UTF8);
                 rStr = sr.ReadToEnd();
             }
             catch (Exception ex1)
