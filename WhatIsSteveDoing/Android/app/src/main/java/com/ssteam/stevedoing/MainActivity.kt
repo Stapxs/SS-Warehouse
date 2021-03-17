@@ -145,84 +145,88 @@ class MainActivity : AppCompatActivity() {
                 msg4.obj = ">>> 错误：用户名或分类组不存在，请设置并保存！"
                 handler.sendMessage(msg4)
                 // 延迟
-                try {
-                    Thread.sleep(30000)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-                break
+//                try {
+//                    Thread.sleep(30000)
+//                } catch (e: InterruptedException) {
+//                    e.printStackTrace()
+//                }
+//                break
             }
 
-            // 提交数据
-            var send = false
-            var name = packageName
-            var url = ""
-            val msg2 = Message()
-            msg2.what = 1
-            msg2.obj = ">>> 发送数据……"
-            handler.sendMessage(msg2)
-            for(str in getSet("hid").split(",")) {
-                if(str == name) {
-                    name = "*****"
-                    val msg4 = Message()
-                    msg4.what = 1
-                    msg4.obj = ">>>> 触发屏蔽词……"
-                    handler.sendMessage(msg4)
-                    break
+            val groups = getSet("group").split(",")
+            for(group in groups) {
+
+                // 提交数据
+                var send = false
+                var name = packageName
+                var url = ""
+                val msg2 = Message()
+                msg2.what = 1
+                msg2.obj = ">>> 发送数据……"
+                handler.sendMessage(msg2)
+                for (str in getSet("hid").split(",")) {
+                    if (str == name) {
+                        name = "*****"
+                        val msg4 = Message()
+                        msg4.what = 1
+                        msg4.obj = ">>>> 触发屏蔽词……"
+                        handler.sendMessage(msg4)
+                        break
+                    }
                 }
-            }
-            if(packageName == lastname) {
-                if(passTimes < 3) {
-                    // 数据未更改
-                    send = false
-                    passTimes ++
-                    val msg1 = Message()
-                    msg1.what = 1
-                    msg1.obj = ">> 数据未更改 -> $passTimes"
-                    handler.sendMessage(msg1)
+                if (packageName == lastname) {
+                    if (passTimes < 3) {
+                        // 数据未更改
+                        send = false
+                        passTimes++
+                        val msg1 = Message()
+                        msg1.what = 1
+                        msg1.obj = ">> 数据未更改 -> $passTimes"
+                        handler.sendMessage(msg1)
+                    } else {
+                        // 防过期刷新
+                        send = true
+                        val time = System.currentTimeMillis()
+                        val nowTime = time / 1000
+                        url = if (getSet("qq") == "ERR") {
+                            "https://stapx.chuhelan.com/api/SS-Doing/?do=$name&name=${getSet(
+                                "name"
+                            )}&time=$nowTime&group=$group&type=Android"
+                        } else {
+                            "https://stapx.chuhelan.com/api/SS-Doing/?do=$name&name=${getSet(
+                                "name"
+                            )}&time=$nowTime&group=$group&type=Android&qq=${getSet("qq")}"
+                        }
+                    }
                 } else {
-                    // 防过期刷新
+                    // 正常提交
                     send = true
                     val time = System.currentTimeMillis()
                     val nowTime = time / 1000
-                    url = if(getSet("qq") == "ERR") {
+                    url = if (getSet("qq") == "ERR") {
                         "https://stapx.chuhelan.com/api/SS-Doing/?do=$name&name=${getSet(
                             "name"
-                        )}&time=$nowTime&group=${getSet("group")}&type=AD"
+                        )}&time=$nowTime&group=$group&type=Android"
                     } else {
                         "https://stapx.chuhelan.com/api/SS-Doing/?do=$name&name=${getSet(
                             "name"
-                        )}&time=$nowTime&group=${getSet("group")}&type=AD&qq=${getSet("qq")}"
+                        )}&time=$nowTime&group=$group&type=Android&qq=${getSet("qq")}"
                     }
                 }
-            } else {
-                // 正常提交
-                send = true
-                val time = System.currentTimeMillis()
-                val nowTime = time / 1000
-                url = if(getSet("qq") == "ERR") {
-                    "https://stapx.chuhelan.com/api/SS-Doing/?do=$name&name=${getSet(
-                        "name"
-                    )}&time=$nowTime&group=${getSet("group")}&type=AD"
-                } else {
-                    "https://stapx.chuhelan.com/api/SS-Doing/?do=$name&name=${getSet(
-                        "name"
-                    )}&time=$nowTime&group=${getSet("group")}&type=AD&qq=${getSet("qq")}"
-                }
-            }
 
-            if(send) {
-                if (!url.isBlank()) {
-                    val back = URL(url).readText()
-                    val msg3 = Message()
-                    msg3.what = 1
-                    msg3.obj = ">> 返回：$back"
-                    handler.sendMessage(msg3)
-                } else {
-                    val msg3 = Message()
-                    msg3.what = 1
-                    msg3.obj = ">> 错误：空。"
-                    handler.sendMessage(msg3)
+                if (send) {
+                    if (!url.isBlank()) {
+                        val back = URL(url).readText()
+                        val msg3 = Message()
+                        msg3.what = 1
+                        msg3.obj = ">> 返回：$back"
+                        handler.sendMessage(msg3)
+                    } else {
+                        val msg3 = Message()
+                        msg3.what = 1
+                        msg3.obj = ">> 错误：空。"
+                        handler.sendMessage(msg3)
+                    }
                 }
             }
 
