@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Steve Doing</string>
+    <string name="log_default">>>> 懒得认真写界面，反正不会放在前台跑</string>
+
+    <string name="log_txt">运行日志</string>
+    <string name="set_txt">程序设置</string>
+    <string name="your_name_txt">你的名字，用于搜索</string>
+    <string name="your_group_txt">你的分类组，用于防止别的群组的人获取到你的数据</string>
+    <string name="your_qq_txt">【选填】你的 QQ 号，用于 At 匹配</string>
+    <string name="hid_text_txt">屏蔽列表（只支持包名）</string>
+    <string name="backrun_text_txt">后台运行</string>
+    <string name="backruninfo_text_txt">比较拉跨的 SS 一开始并没有考虑到要唤起 Activity 并且隐藏掉 FromRecents，所以只能拉跨的再唤起一次了。</string>
+
+    <string name="save_bottom_txt">保存设置</string>
+    <string name="hid_bottom_txt">退出并后台重启</string>
+    <string name="addhid_bottom_txt">添加</string>
+    <string name="delhid_bottom_txt">删除</string>
+    <string name="hidlog_bottom_txt">隐藏日志</string>
+    <string name="showlog_bottom_txt">显示日志</string>
+    <string name="about_bottom_txt">关于应用</string>
+    <string name="power_bottom_txt">关于作者</string>
+    <string name="update_bottom_txt">更新日志</string>
+    <string name="backrun_bottom_txt">退出并后台重启</string>
+
+    <string name="about_title">WhatIsSteveDoing</string>
+    <string name="about_ver">1.2.7</string>
+    <string name="about_txt">Xiaoshou Bot 前台应用同步工具</string>
+    <string name="about_by">Copyright © Stapx Steve [林槐] 2020</string>
+</resources>

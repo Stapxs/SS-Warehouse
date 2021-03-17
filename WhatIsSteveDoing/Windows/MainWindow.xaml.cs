@@ -87,7 +87,7 @@ namespace WhatIsSteveDoing
                 }
             }
 
-            logbox.Text += GetForgroundAppInfo();
+            logbox.Text += GetAndSend();
 
             logbox.Text += "\n\n>>> 初始化完成，使用 Ctrl + Alt + U 显示隐藏的窗口。\n\n";
 
@@ -136,7 +136,7 @@ namespace WhatIsSteveDoing
                         logbox.Text += "\n>> 正在处理更新……";
                     }), System.Windows.Threading.DispatcherPriority.SystemIdle, null);
 
-                    string back = GetForgroundAppInfo();
+                    string back = GetAndSend();
 
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
@@ -148,7 +148,7 @@ namespace WhatIsSteveDoing
                         logbox.SelectionStart = logbox.Text.Length;
                     }), System.Windows.Threading.DispatcherPriority.SystemIdle, null);
 
-                    Thread.Sleep(30000);
+                    Thread.Sleep(20000);
                 }
             }
         }
@@ -193,8 +193,12 @@ namespace WhatIsSteveDoing
         {
             logbox.Text += "\n>> 读取设置……\n";
             System.Collections.Generic.List<setVer> info = new System.Collections.Generic.List<setVer>();
+            if(!File.Exists(fsave))
+            {
+                File.Create(fsave).Dispose();
+            }
             StreamReader sr = new StreamReader(fsave, Encoding.GetEncoding("UTF-8"));
-            String line;
+            string line;
             while ((line = sr.ReadLine()) != null)
             {
                 if (!string.IsNullOrWhiteSpace(line))
@@ -250,7 +254,7 @@ namespace WhatIsSteveDoing
             public string windowName;
         }
 
-        public string GetForgroundAppInfo()
+        public string GetAndSend()
         {
             string says = "";
 
@@ -288,28 +292,32 @@ namespace WhatIsSteveDoing
                         string time = GetTimeStamp();
                         lastname = s.ToString();
                         string url = "";
-                        says += "\n>> 发送数据……";
-                        if (noqq)
+                        string[] ygroups = ygroup.Split(',');
+                        foreach (string yg in ygroups)
                         {
-                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
-                                "&type=PC";
-                            says += "\ndo= " +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
-                                "&type=PC";
+                            says += "\n>> 发送数据……";
+                            if (noqq)
+                            {
+                                url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + yg +
+                                    "&type=Windows";
+                                says += "\ndo= " +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + yg +
+                                    "&type=Windows";
+                            }
+                            else
+                            {
+                                url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + yg + "&qq=" + yqq +
+                                    "&type=Windows";
+                                says += "\ndo= " +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + yg + "&qq=" + yqq +
+                                    "&type=Windows";
+                            }
+                            string back = CallWebPage(url, null, null);
+                            says += "\n返回：" + back;
+                            passTimes = 0;
                         }
-                        else
-                        {
-                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
-                                "&type=PC";
-                            says += "\ndo= " +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
-                                "&type=PC";
-                        }
-                        string back = CallWebPage(url, null, null);
-                        says += "\n返回：" + back;
-                        passTimes = 0;
                     }
                     else
                     {
@@ -329,28 +337,32 @@ namespace WhatIsSteveDoing
                         string time = GetTimeStamp();
                         lastname = s.ToString();
                         string url = "";
-                        says += "\n>> 发送数据……";
-                        if (noqq)
+                        string[] ygroups = ygroup.Split(',');
+                        foreach (string yg in ygroups)
                         {
-                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
-                                "&type=PC";
-                            says += "\ndo= " +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
-                                "&type=PC";
+                            says += "\n>> 发送数据……";
+                            if (noqq)
+                            {
+                                url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                    "&type=Windows";
+                                says += "\ndo= " +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                    "&type=Windows";
+                            }
+                            else
+                            {
+                                url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                    "&type=Windows";
+                                says += "\ndo= " +
+                                    title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                    "&type=Windows";
+                            }
+                            string back = CallWebPage(url, null, null);
+                            says += "\n返回：" + back;
+                            passTimes = 0;
                         }
-                        else
-                        {
-                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
-                                "&type=PC";
-                            says += "\ndo= " +
-                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
-                                "&type=PC";
-                        }
-                        string back = CallWebPage(url, null, null);
-                        says += "\n返回：" + back;
-                        passTimes = 0;
                     }
                 }
             }
@@ -362,27 +374,31 @@ namespace WhatIsSteveDoing
                     string time = GetTimeStamp();
                     lastname = s.ToString();
                     string url = "";
-                    says += "\n>> 发送数据……";
-                    if (noqq)
+                    string[] ygroups = ygroup.Split(',');
+                    foreach (string yg in ygroups)
                     {
-                        url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
-                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
-                            "&type=PC";
-                        says += "\ndo= " +
-                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
-                            "&type=PC";
+                        says += "\n>> 发送数据……";
+                        if (noqq)
+                        {
+                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                "&type=Windows";
+                            says += "\ndo= " +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup +
+                                "&type=Windows";
+                        }
+                        else
+                        {
+                            url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                "&type=Windows";
+                            says += "\ndo=" +
+                                title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
+                                "&type=Windows";
+                        }
+                        string back = CallWebPage(url, null, null);
+                        says += "\n返回：" + back;
                     }
-                    else
-                    {
-                        url = "https://stapx.chuhelan.com/api/SS-Doing/?do=" +
-                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
-                            "&type=PC";
-                        says += "\ndo=" +
-                            title + "&name=" + yname + "&time=" + time + "&group=" + ygroup + "&qq=" + yqq +
-                            "&type=PC";
-                    }
-                    string back = CallWebPage(url, null, null);
-                    says += "\n返回：" + back;
                 }
                 else
                 {
