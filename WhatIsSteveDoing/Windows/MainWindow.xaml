@@ -186,7 +186,7 @@
                     <StackPanel Margin="20,0">
                         <TextBlock Text="你的名字，用于搜索" Margin="0,10,0,0" Foreground="#737373"/>
                         <TextBox x:Name="name" Margin="0,10,0,0" Height="30" VerticalContentAlignment="Center"/>
-                        <TextBlock Text="你的分类组，用于防止其他群组的人调取到你的数据" Margin="0,10,0,0" Foreground="#737373"/>
+                        <TextBlock Text="你的分类组，用于防止其他群组的人调取到你的数据，多个使用英文逗号隔开" Margin="0,10,0,0" Foreground="#737373"/>
                         <TextBox x:Name="group" Margin="0,10,0,0" Height="30" VerticalContentAlignment="Center"/>
                         <TextBlock Text="你的 QQ，选填，填写后可以使用 QQ 号获取" Margin="0,10,0,0" Foreground="#737373"/>
                         <TextBox x:Name="qq" Margin="0,10,0,0" Height="30" VerticalContentAlignment="Center"/>
