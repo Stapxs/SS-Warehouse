@@ -271,7 +271,7 @@ namespace WhatIsSteveDoing
             info.windowName = s.ToString();
 
             // 测试
-            says += "\n>> 当前的前台窗口标题为：" + s.ToString() + "\n句柄：" + (int)hWnd;
+            says += "\n>> 当前的前台窗口标题为：" + s.ToString() + "\n句柄：" + (int)hWnd + "\n时间：" + GetTimeStamp();
 
             // 屏蔽
             string title = s.ToString();
